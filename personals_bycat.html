@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="../src/text.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+<style>
+
+body {
+  overflow-y:scroll;
+  font: 14px serif;
+ color: rgba(0, 0, 0, .8);
+
+}
+
+text {
+	font-size: 12px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;
+}
+
+#chart1 {
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+/*
+  Minimum height and width is a good idea to prevent negative SVG dimensions...
+  For example width should be =< margin.left + margin.right + 1,
+  of course 1 pixel for the entire chart would not be very useful, BUT should not have errors
+*/
+}
+
+#chart1 svg {
+  height: 600px;
+  width:600px;
+  
+}
+
+</style>
+<body> 
+	<div id = "title">
+		<span style = "color:#000">craigs</span><span style = "color:#aaa">atlas</span>
+	</div>
+	<div id="subtitle">
+		<a href="index.html">Home </a>&nbsp;&nbsp;&nbsp;
+		<a href="jobs.html">Jobs</a> &nbsp;&nbsp;&nbsp;
+		<a href="services.html">Services</a>&nbsp;&nbsp;&nbsp;
+		<a href="forsale.html">For Sale</a>&nbsp;&nbsp;&nbsp;
+		<a href="personals.html">Personals</a>&nbsp;&nbsp;&nbsp;
+	<a href="housing.html">Housing</a>
+		</div>
+	<div id="pageinfo"></div>
+<div class="row">
+    <div class="col-md-6">
+		<div id="charttitle">Percentage Catagories of Personals</div>
+		<div id="chart1">
+			<svg></svg>
+		</div>
+    </div>
+</div>
+<div id = "footer">
+	*More Info
+</div>
+
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/tooltip.js"></script>
+<script src="../src/models/legend.js"></script>
+<script src="../src/models/axis.js"></script>
+<script src="../src/models/multiBarHorizontal.js"></script>
+<script src="../src/models/multiBarHorizontalChart.js"></script>
+<script src="stream_layers.js"></script>
+<script>
+
+
+
+dataset = [ 
+  {
+   key:'m4m', 
+   color: '#5ADC41',
+   values:
+   [
+   {"label":" Atlanta ", "value": 46.34 },
+   {"label":" Austin ", "value": 48.52 },
+   {"label":" Boston ", "value": 48.37 },
+   {"label":" Chicago ", "value": 46.54 },
+   {"label":" Dallas ", "value": 49.42 },
+   {"label":" Denver ", "value": 46.65 },
+   {"label":" Detroit ", "value": 48.22 },
+   {"label":" Houston ", "value": 49.83 },
+   {"label":" Las Vegas ", "value": 44.13 },
+   {"label":" Los Angeles ", "value": 49.43 },
+   {"label":" Miami ", "value": 55.51 },
+   {"label":" Minneapolis ", "value": 50.43 },
+   {"label":" New York ", "value": 43.91 },
+   {"label":" Orange County ", "value": 50.22 },
+   {"label":" Phoenix ", "value": 47.65 },
+   {"label":" Portland ", "value": 35.99 },
+   {"label":" Raleigh ", "value": 49.59 },
+   {"label":" Sacramento ", "value": 36.68 },
+   {"label":" San Diego ", "value": 42.35 },
+   {"label":" Seattle ", "value": 37.95 },
+   {"label":" SF Bay ", "value": 45.91 },
+   {"label":" Washington DC ", "value": 47.76 },
+   ]
+},
+{
+   key:'m4w', 
+   color:'#60E189',
+   values:
+   [
+   {"label":" Atlanta ", "value": 34.11 },
+   {"label":" Austin ", "value": 39.28 },
+   {"label":" Boston ", "value": 37.38 },
+   {"label":" Chicago ", "value": 37.7 },
+   {"label":" Dallas ", "value": 36.95 },
+   {"label":" Denver ", "value": 37.8 },
+   {"label":" Detroit ", "value": 33.7 },
+   {"label":" Houston ", "value": 34.79 },
+   {"label":" Las Vegas ", "value": 32.56 },
+   {"label":" Los Angeles ", "value": 33.51 },
+   {"label":" Miami ", "value": 30.74 },
+   {"label":" Minneapolis ", "value": 38.24 },
+   {"label":" New York ", "value": 34.52 },
+   {"label":" Orange County ", "value": 35.09 },
+   {"label":" Phoenix ", "value": 38.47 },
+   {"label":" Portland ", "value": 44.52 },
+   {"label":" Raleigh ", "value": 39.13 },
+   {"label":" Sacramento ", "value": 46.58 },
+   {"label":" San Diego ", "value": 38.8 },
+   {"label":" Seattle ", "value": 44.37 },
+   {"label":" SF Bay ", "value": 38.9 },
+   {"label":" Washington DC ", "value": 36.14 },
+   ]
+},
+{
+key:'w4m', 
+color:'#539230',
+values:[
+{"label":" Atlanta ", "value": 4.58 },
+{"label":" Austin ", "value": 3.8 },
+{"label":" Boston ", "value": 4.35 },
+{"label":" Chicago ", "value": 5.39 },
+{"label":" Dallas ", "value": 3.62 },
+{"label":" Denver ", "value": 4.23 },
+{"label":" Detroit ", "value": 2.26 },
+{"label":" Houston ", "value": 4.18 },
+{"label":" Las Vegas ", "value": 10.42 },
+{"label":" Los Angeles ", "value": 5.6 },
+{"label":" Miami ", "value": 3.57 },
+{"label":" Minneapolis ", "value": 2.94 },
+{"label":" New York ", "value": 9.15 },
+{"label":" Orange County ", "value": 2.98 },
+{"label":" Phoenix ", "value": 3.79 },
+{"label":" Portland ", "value": 8.67 },
+{"label":" Raleigh ", "value": 3.37 },
+{"label":" Sacramento ", "value": 6.15 },
+{"label":" San Diego ", "value": 7.39 },
+{"label":" Seattle ", "value": 5.72 },
+{"label":" SF Bay ", "value": 3.84 },
+{"label":" Washington DC ", "value": 3.91 },
+]
+},
+{
+key:'w4w', 
+color: '#59AE75',
+values:[
+{"label":" Atlanta ", "value": 6.87 },
+{"label":" Austin ", "value": 3.66 },
+{"label":" Boston ", "value": 2.3 },
+{"label":" Chicago ", "value": 3.09 },
+{"label":" Dallas ", "value": 4.29 },
+{"label":" Denver ", "value": 3.28 },
+{"label":" Detroit ", "value": 4.11 },
+{"label":" Houston ", "value": 5.03 },
+{"label":" Las Vegas ", "value": 4.26 },
+{"label":" Los Angeles ", "value": 3.28 },
+{"label":" Miami ", "value": 4.31 },
+{"label":" Minneapolis ", "value": 2.64 },
+{"label":" New York ", "value": 2.61 },
+{"label":" Orange County ", "value": 3.05 },
+{"label":" Phoenix ", "value": 3.57 },
+{"label":" Portland ", "value": 3.34 },
+{"label":" Raleigh ", "value": 4.69 },
+{"label":" Sacramento ", "value": 3.89 },
+{"label":" San Diego ", "value": 2.62 },
+{"label":" Seattle ", "value": 3.3 },
+{"label":" SF Bay ", "value": 2.58 },
+{"label":" Washington DC ", "value": 2.64 },
+]
+},								
+{
+	key:'Not Specified',
+	color:'#ABD865',
+	values:[
+	{"label":" Atlanta ", "value": 8.09 },
+	{"label":" Austin ", "value": 4.72 },
+	{"label":" Boston ", "value": 7.60 },
+	{"label":" Chicago ", "value": 7.28 },
+	{"label":" Dallas ", "value": 5.72 },
+	{"label":" Denver ", "value": 8.04 },
+	{"label":" Detroit ", "value": 11.72 },
+	{"label":" Houston ", "value": 6.18 },
+	{"label":" Las Vegas ", "value": 8.64 },
+	{"label":" Los Angeles ", "value": 8.18 },
+	{"label":" Miami ", "value": 5.88 },
+	{"label":" Minneapolis ", "value": 5.75 },
+	{"label":" New York ", "value": 9.82 },
+	{"label":" Orange County ", "value": 8.67 },
+	{"label":" Phoenix ", "value": 6.51 },
+	{"label":" Portland ", "value": 7.49},
+	{"label":" Raleigh ", "value": 3.23 },
+	{"label":" Sacramento ", "value": 6.71 },
+	{"label":" San Diego ", "value": 8.84 },
+	{"label":" Seattle ", "value": 8.67 },
+	{"label":" SF Bay ", "value": 8.78 },
+	{"label":" Washington DC ", "value": 9.55 },
+	
+	]
+	
+}
+
+
+];
+
+
+var chart;
+nv.addGraph(function() {
+  chart = nv.models.multiBarHorizontalChart()
+      .x(function(d) { return d.label })
+      .y(function(d) { return d.value })
+      .margin({top: 30, right: 20, bottom: 50, left:150})
+      //.showValues(true)
+      //.tooltips(false)
+      .transitionDuration(500)
+      .stacked(true)
+    .showValues(false);
+      //.showControls(false);
+
+  chart.yAxis
+      .tickFormat(d3.format(',.2f'));
+
+  d3.select('#chart1 svg')
+      .datum(dataset)
+      .call(chart);
+      
+  
+  nv.utils.windowResize(chart.update);
+
+  chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+  return chart;
+});
+
+
+
+</script>

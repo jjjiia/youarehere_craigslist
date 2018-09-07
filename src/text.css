@@ -1,0 +1,101 @@
+.nvtooltip * {
+	font-size:12px;
+	font-family: "Times New Roman", serif; 	
+}
+a:link {color:#000; text-decoration:none;}      /* unvisited link */
+a:visited {color:#000; !important}  /* visited link */
+a:hover {color:#888; text-decoration:underline;}  /* mouse over link */
+a:active {color:#000;!important}  /* selected link */
+body {
+	overflow-y:scroll;  
+	font-size:12px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;
+	color: rgba(0, 0, 0, .9);
+}
+.h1{font-size:11px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;
+}
+body {
+  overflow-y:scroll;
+  font: 12px serif;
+ color: rgba(0, 0, 0, .8);
+
+}
+
+text {
+	font-size: 12px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;
+}
+
+#subtitle {
+	font-size:11px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;
+	margin-left:20px;
+	margin-top: 20px;
+	margin-bottom:0px;
+	
+	
+}
+text{
+	font-size:11px;
+	font-family: "Times New Roman", serif; 
+	letter-spacing:2px;	
+}
+#chart2 {
+	/*
+	margin: 10px;
+	position:absolute;
+	left:500px;
+	width:650px;
+	*/
+}
+#charttitle{
+	margin-left:20px;
+	margin-bottom:20px;
+}
+#chart2 svg {
+	height: 600px;
+	width:600px;
+}
+#chart1 {
+	/*margin: 10px;
+	width:650px;*/
+}
+#chart1 svg {
+	height: 600px;
+	width:600px;
+}
+#title
+{
+	height:50px;
+	width:300px;
+	margin-left:20px;
+	margin-top:5px;
+	font-size:50px; 
+	letter-spacing: 5px;
+}
+#pageinfo
+{
+	margin-left:20px;
+	color:#000;
+	line-height:150%;
+	height: 30px;
+	width:600px;
+	letter-spacing:2px;
+	
+}
+#footer
+{
+	position:absolute;
+	top:8px;
+	right:10px;
+	width:80px;
+	height:20px;   /* Height of the footer */
+	background:#fff;
+	font-size: 11px;
+	letter-spacing:1px;
+}

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="http://craigsatlas.org/atlas1/src/nv.d3.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="http://craigsatlas.org/atlas1/src/nv.d3.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+<link rel="stylesheet" href="bootstrap/css/bootstrap.css" type="text/css" media="screen" title="no title" charset="utf-8">
+<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.css" type="text/css" media="screen" title="no title" charset="utf-8">
+<link rel="stylesheet" href="src/text.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+<style>
+#chart1 {
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+/*
+  Minimum height and width is a good idea to prevent negative SVG dimensions...
+  For example width should be =< margin.left + margin.right + 1,
+  of course 1 pixel for the entire chart would not be very useful, BUT should not have errors
+*/
+}
+
+#chart1 svg {
+  height: 500px;
+  width:800px;
+}
+
+</style>
+<body> 
+	<div id = "title">
+		<span style = "color:#000">craigs</span><span style = "color:#aaa">atlas</span>
+	</div>
+	<div id="subtitle">
+		<a href="index.html">Home </a>&nbsp;&nbsp;&nbsp;
+		<a href="jobs.html">Jobs</a> &nbsp;&nbsp;&nbsp;
+		<a href="services.html">Services</a>&nbsp;&nbsp;&nbsp;
+		<a href="forsale.html">For Sale</a>&nbsp;&nbsp;&nbsp;
+		<a href="personals.html">Personals</a>&nbsp;&nbsp;&nbsp;
+		<a href="housing.html">Housing</a>
+		</div>
+		<div id ="pageinfo"><br/>How often are apartments described as these terms? </div>
+	<div id="pageinfo"></div>
+<div class="row">
+    <div class="col-md-6">
+		<div id="charttitle">% of Posts Containing These Housing Keywords </div>
+		<div id="chart1">
+			<svg></svg>
+		</div>
+    </div>
+    <div class="col-md-6">
+		<div id="charttitle"></div>
+
+		</div>
+    </div>
+</div>
+<div id = "footer">
+	* <a href="info.html">More Info</a>
+</div>
+
+<script src="http://craigsatlas.org/atlas1/lib/d3.v3.js"></script>
+<script src="http://craigsatlas.org/atlas1/nv.d3.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/utils.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/tooltip.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/models/legend.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/models/axis.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/models/multiBarHorizontal.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/models/multiBarHorizontalChart.js"></script>
+<script src="http://craigsatlas.org/atlas1/src/stream_layers.js"></script>
+<script>
+
+
+
+dataset = [ 
+  {
+   key:'Hardwood', 
+   color: '#3A7BAB',
+   values:
+   [
+   {"label": "atlanta", "value":0.587972036606},
+   {"label": "austin", "value":1.14156626506},
+   {"label": "boston", "value":3.69415077048},
+   {"label": "chicago", "value":5.08649772255},
+   {"label": "dallas", "value":0.579415277102},
+   {"label": "denver", "value":0.307803186138},
+   {"label": "detroit", "value":0.628022993745},
+   {"label": "houston", "value":0.651477207054},
+   {"label": "lasvegas", "value":0.0993206768969},
+   {"label": "losangeles", "value":1.57946692991},
+   {"label": "miami", "value":0.0713262376025},
+   {"label": "minneapolis", "value":0.517865313423},
+   {"label": "newyork", "value":0.821310393612},
+   {"label": "orangecounty", "value":0.369706350709},
+   {"label": "phoenix", "value":0.0342474775416},
+   {"label": "portland", "value":0.459345754271},
+   {"label": "raleigh", "value":0.587839743173},
+   {"label": "sacramento", "value":0.201487167186},
+   {"label": "sandiego", "value":0.254635155566},
+   {"label": "seattle", "value":0.664651224826},
+   {"label": "sfbay", "value":0.576221268967},
+   {"label": "washingtondc", "value":0.727724529641}
+   ]
+},
+{
+   key:'Spacious', 
+   color:'#2E4266',
+   values:
+   [
+   {"label": "atlanta", "value":3.24542045402},
+   {"label": "austin", "value":2.11295180723},
+   {"label": "boston", "value":4.49722702493},
+   {"label": "chicago", "value":4.03353135613},
+   {"label": "dallas", "value":2.74846300146},
+   {"label": "denver", "value":2.5945556373},
+   {"label": "detroit", "value":2.49689787029},
+   {"label": "houston", "value":2.27841894187},
+   {"label": "lasvegas", "value":2.62706981258},
+   {"label": "losangeles", "value":3.67302983295},
+   {"label": "miami", "value":4.59808279992},
+   {"label": "minneapolis", "value":3.13838858617},
+   {"label": "newyork", "value":4.22333945756},
+   {"label": "orangecounty", "value":3.59572833265},
+   {"label": "phoenix", "value":2.34305434811},
+   {"label": "portland", "value":3.10380355456},
+   {"label": "raleigh", "value":3.48799375285},
+   {"label": "sacramento", "value":3.49724154473},
+   {"label": "sandiego", "value":3.18293944458},
+   {"label": "seattle", "value":3.11652514116},
+   {"label": "sfbay", "value":3.25458309324},
+   {"label": "washingtondc", "value":4.37522186723}
+   ]
+},
+{
+   key:'Cozy', 
+   color:'#4776DB',
+   values:
+   [
+   {"label": "atlanta", "value":0.511581968858},
+   {"label": "austin", "value":0.430722891566},
+   {"label": "boston", "value":0.392090171291},
+   {"label": "chicago", "value":0.429364926111},
+   {"label": "dallas", "value":0.436994117387},
+   {"label": "denver", "value":0.672662572634},
+   {"label": "detroit", "value":0.590037732027},
+   {"label": "houston", "value":0.3344950176},
+   {"label": "lasvegas", "value":0.565597137138},
+   {"label": "losangeles", "value":0.760246663504},
+   {"label": "miami", "value":0.462083341019},
+   {"label": "minneapolis", "value":0.474189925544},
+   {"label": "newyork", "value":0.524594210949},
+   {"label": "orangecounty", "value":0.550105232681},
+   {"label": "phoenix", "value":0.299270265286},
+   {"label": "portland", "value":0.789902979308},
+   {"label": "raleigh", "value":0.514088631483},
+   {"label": "sacramento", "value":1.03142240345},
+   {"label": "sandiego", "value":0.56762420095},
+   {"label": "seattle", "value":0.973636242387},
+   {"label": "sfbay", "value":0.875002667691},
+   {"label": "washingtondc", "value":0.678913738019}
+   ]
+},
+{
+   key:'Quiet', 
+   color:'#364F89',
+   values:
+   [
+   {"label": "atlanta", "value":0.570996465995},
+   {"label": "austin", "value":0.475903614458},
+   {"label": "boston", "value":0.654743346277},
+   {"label": "chicago", "value":0.400967774913},
+   {"label": "dallas", "value":0.394533150515},
+   {"label": "denver", "value":0.465458476599},
+   {"label": "detroit", "value":0.389982020309},
+   {"label": "houston", "value":0.429064289592},
+   {"label": "lasvegas", "value":0.495087038273},
+   {"label": "losangeles", "value":1.14229304753},
+   {"label": "miami", "value":0.561694121119},
+   {"label": "minneapolis", "value":0.740401813568},
+   {"label": "newyork", "value":0.74107833782},
+   {"label": "orangecounty", "value":0.991080277502},
+   {"label": "phoenix", "value":0.470507652994},
+   {"label": "portland", "value":1.01313642998},
+   {"label": "raleigh", "value":0.609531246611},
+   {"label": "sacramento", "value":1.57351882946},
+   {"label": "sandiego", "value":1.08219941116},
+   {"label": "seattle", "value":1.33152536345},
+   {"label": "sfbay", "value":1.54939496767},
+   {"label": "washingtondc", "value":0.528044018459}
+   ]
+}
+];
+
+
+var chart;
+nv.addGraph(function() {
+  chart = nv.models.multiBarHorizontalChart()
+      .x(function(d) { return d.label })
+      .y(function(d) { return d.value })
+      .margin({top: 30, right: 20, bottom: 50, left:60})
+      //.showValues(true)
+      //.tooltips(false)
+      .transitionDuration(500)
+      .stacked(true)
+    .showValues(false);
+      //.showControls(false);
+
+  chart.yAxis
+      .tickFormat(d3.format(',.2f'));
+
+  d3.select('#chart1 svg')
+      .datum(dataset)
+      .call(chart);
+      
+  
+  nv.utils.windowResize(chart.update);
+
+  chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+  return chart;
+});
+
+
+
+</script>

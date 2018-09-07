@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+
+<style>
+
+body {
+  overflow-y:scroll;
+  font: 14px sans-serif;
+ color: rgba(0, 0, 0, .7);
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+#chart1 {
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+/*
+  Minimum height and width is a good idea to prevent negative SVG dimensions...
+  For example width should be =< margin.left + margin.right + 1,
+  of course 1 pixel for the entire chart would not be very useful, BUT should not have errors
+*/
+}
+
+#chart1 svg {
+  height: 600px;
+  width:600px;
+}
+
+</style>
+<body>
+	Profiles of Jobs Across Cities
+  <div id="chart1" class='with-3d-shadow with-transitions'>
+    <svg></svg>
+  </div>
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/tooltip.js"></script>
+<script src="../src/models/legend.js"></script>
+<script src="../src/models/axis.js"></script>
+<script src="../src/models/multiBarHorizontal.js"></script>
+<script src="../src/models/multiBarHorizontalChart.js"></script>
+<script src="stream_layers.js"></script>
+<script>
+
+
+
+dataset = [ 
+  {
+   key:'transport', 
+   color:'#53B03C',
+   values:
+   [
+   {"label":"Boston", "value":-3.52363797939493}, 
+   {"label":"New York", "value":-3.67500401144349}, 
+   {"label":"SF Bay", "value":-3.70148787624596}, 
+   {"label":"Los Angeles", "value":-2.24888787136633}, 
+   {"label":"Seattle", "value":-3.02926738059774}, 
+   {"label":"Chicago", "value":7.13174008181759}, 
+   {"label":"Houston", "value":2.61446486548751}, 
+   {"label":"Detroit", "value":6.22240539629506},
+   ]
+},
+{
+   key:'general labor', 
+   color:'#B0DD9E',
+   values:
+   [
+   {"label":"Boston", "value":-1.26350815488635}, 
+   {"label":"New York", "value":-3.58560362610898},
+   {"label":"SF Bay", "value":-3.15553158457593}, 
+   {"label":"Los Angeles", "value":-3.50973583765021}, 
+   {"label":"Seattle", "value":0.111097572051654}, 
+   {"label":"Chicago", "value":-0.553103559777383}, 
+   {"label":"Houston", "value":2.46216950686227}, 
+   {"label":"Detroit", "value":7.91058565554758},
+   ]
+},
+{
+key:'manufacturing', color:'#72905F',
+values:[{"label":"Boston", "value":-0.840889053342961}, 
+{"label":"New York", "value":-1.40422968977241}, 
+{"label":"SF Bay", "value":-0.387156158937804}, 
+{"label":"Los Angeles", "value":-0.45364156144477}, 
+{"label":"Seattle", "value":0.389373475846665}, 
+{"label":"Chicago", "value":0.214046101342844}, 
+{"label":"Houston", "value":0.563607089640906}, 
+{"label":"Detroit", "value":1.68269346919791},]
+},
+{
+key:'skilled trade craft', 
+color: '#62E790',
+values:[
+{"label":"Boston", "value":-2.12564613574315}, 
+{"label":"New York", "value":-4.23452544745384}, 
+{"label":"SF Bay", "value":-2.0143576454563}, 
+{"label":"Los Angeles", "value":-3.6951637414238}, 
+{"label":"Seattle", "value":-0.133011853682375}, 
+{"label":"Chicago", "value":-2.68889559865209},
+{"label":"Houston", "value":2.63741578907403}, 
+{"label":"Detroit", "value":1.81282531808098}, ]
+},
+{
+key:'security', 
+color: '#8BBD3E',
+values:[
+{"label":"Boston", "value":-0.306167120463541}, 
+{"label":"New York", "value":0.067477277136504}, 
+{"label":"SF Bay", "value":0.145410294715888}, 
+{"label":"Los Angeles", "value":0.273783990916963}, 
+{"label":"Seattle", "value":-0.327103094356841}, 
+{"label":"Chicago", "value":-0.219729610787737}, 
+{"label":"Houston", "value":1.34636498182967}, 
+{"label":"Detroit", "value":0.08741785600953},]
+},
+{
+key:'software qa dba', 
+color: '#F2B929',
+values:[
+{"label":"Boston", "value":1.27170420854638}, 
+{"label":"New York", "value":-0.129989425906463}, 
+{"label":"SF Bay", "value":2.385626742085}, 
+{"label":"Los Angeles", "value":-0.23644441227414}, 
+{"label":"Seattle", "value":2.35465147946286}, 
+{"label":"Chicago", "value":-0.406768682432638}, 
+{"label":"Houston", "value":-0.914874538996944}, 
+{"label":"Detroit", "value":-1.04715248532421},]
+},
+{
+key:'internet engineers', 
+color: '#EEC173',
+values:[
+{"label":"Boston", "value":-0.016095068073956}, 
+{"label":"New York", "value":0.205538477874818}, 
+{"label":"SF Bay", "value":0.742957502517496}, 
+{"label":"Los Angeles", "value":0.09167512773394}, 
+{"label":"Seattle", "value":0.208920271393786}, 
+{"label":"Chicago", "value":0.028080453649632}, 
+{"label":"Houston", "value":-0.176163294630162}, 
+{"label":"Detroit", "value":-0.214063805211781},]
+},
+{
+key:'systems network', 
+color: '#EFB230',
+values:[
+{"label":"Boston", "value":0.322491233799365}, 
+{"label":"New York", "value":0.180922255360282}, 
+{"label":"SF Bay", "value":0.283585559295105}, 
+{"label":"Los Angeles", "value":-0.061836390110903}, 
+{"label":"Seattle", "value":0.356716028629182}, 
+{"label":"Chicago", "value":0.038707398406196}, 
+{"label":"Houston", "value":-0.243697620701323}, 
+{"label":"Detroit", "value":-0.154648378557373},]
+},
+{
+key:'technical support', 
+color: '#BA8E30',
+values:[
+{"label":"Boston", "value":0.192139931506952}, 
+{"label":"New York", "value":-0.088599716884298}, 
+{"label":"SF Bay", "value":0.186644869454421}, 
+{"label":"Los Angeles", "value":-0.042433659460258}, 
+{"label":"Seattle", "value":0.260973677791792}, 
+{"label":"Chicago", "value":-0.22600148168446}, 
+{"label":"Houston", "value":-0.410202939360586}, 
+{"label":"Detroit", "value":-0.232015812430489},]
+},
+{
+key:'education', 
+color:'#DF3F29',
+values:[
+{"label":"Boston", "value":0.315124950995461}, 
+{"label":"New York", "value":-0.036243237154363}, 
+{"label":"SF Bay", "value":1.8503112999636}, 
+{"label":"Los Angeles", "value":0.211769828684008}, 
+{"label":"Seattle", "value":0.034234873662145}, 
+{"label":"Chicago", "value":0.305010729055155}, 
+{"label":"Houston", "value":-0.291312987444306}, 
+{"label":"Detroit", "value":-1.16610988017283},]
+},
+{
+key:'nonprofit sector', 
+color:'#D26446',
+values:[
+{"label":"Boston", "value":1.66630500686003}, 
+{"label":"New York", "value":-0.414250683775563}, 
+{"label":"SF Bay", "value":3.00186791555749}, 
+{"label":"Los Angeles", "value":0.087397893971896}, 
+{"label":"Seattle", "value":0.638395199759647}, 
+{"label":"Chicago", "value":-0.453673943311722}, 
+{"label":"Houston", "value":-1.18889071006539}, 
+{"label":"Detroit", "value":-0.875168983214228},]
+},
+
+{key:'	accounting+finance'	, color:'#66676E',	values:[	{"label":"Boston", "value":	1.30435166699596	}, {"label":"New York", "value":	0.359369910203826	}, {"label":"SF Bay", "value":	0.999450876014206	}, {"label":"Los Angeles", "value":	0.786821551735934	}, {"label":"Seattle", "value":	0.168403149770448	}, {"label":"Chicago", "value":	-0.423953231265396	}, {"label":"Houston", "value":	-0.621798781905237	}, {"label":"Detroit", "value":	-1.1653496828228	},]},										
+{key:'	admin office'	, color:'#4F70C7',	values:[	{"label":"Boston", "value":	1.98727896741633	}, {"label":"New York", "value":	1.6121728720847	}, {"label":"SF Bay", "value":	0.163345190834556	}, {"label":"Los Angeles", "value":	1.95690290904566	}, {"label":"Seattle", "value":	-0.360233583205485	}, {"label":"Chicago", "value":	-0.401165183003017	}, {"label":"Houston", "value":	-0.246947412669804	}, {"label":"Detroit", "value":	-1.02640336267227	},]},										
+{key:'	business mgmt'	, color:'#3B4F80',	values:[	{"label":"Boston", "value":	0.081416926298816	}, {"label":"New York", "value":	-0.318621660510521	}, {"label":"SF Bay", "value":	0.083065910342581	}, {"label":"Los Angeles", "value":	-0.015268045900521	}, {"label":"Seattle", "value":	0.317547697171786	}, {"label":"Chicago", "value":	-0.181233124548162	}, {"label":"Houston", "value":	-0.018990285898194	}, {"label":"Detroit", "value":	-0.55998789331766	},]},										
+{key:'	human resources'	, color:'#263047',	values:[	{"label":"Boston", "value":	0.435005901013954	}, {"label":"New York", "value":	0.137995182782302	}, {"label":"SF Bay", "value":	0.369538250261645	}, {"label":"Los Angeles", "value":	0.130332091788911	}, {"label":"Seattle", "value":	0.209673866572262	}, {"label":"Chicago", "value":	0.031615042629732	}, {"label":"Houston", "value":	-0.168245488358172	}, {"label":"Detroit", "value":	-0.265968220339821	},]},										
+
+];
+
+
+var chart;
+nv.addGraph(function() {
+  chart = nv.models.multiBarHorizontalChart()
+      .x(function(d) { return d.label })
+      .y(function(d) { return d.value })
+      .margin({top: 30, right: 20, bottom: 50, left:150})
+      //.showValues(true)
+      //.tooltips(false)
+      .transitionDuration(500)
+      .stacked(true)
+    .showValues(false);
+      //.showControls(false);
+
+  chart.yAxis
+      .tickFormat(d3.format(',.2f'));
+
+  d3.select('#chart1 svg')
+      .datum(dataset)
+      .call(chart);
+      
+  
+  nv.utils.windowResize(chart.update);
+
+  chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+  return chart;
+});
+
+
+
+</script>

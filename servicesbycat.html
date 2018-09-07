@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+
+<style>
+
+body {
+  overflow-y:scroll;  
+  font: 14px sans-serif;
+ color: rgba(0, 0, 0, .7);
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+#chart1 {
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+/*
+  Minimum height and width is a good idea to prevent negative SVG dimensions...
+  For example width should be =< margin.left + margin.right + 1,
+  of course 1 pixel for the entire chart would not be very useful, BUT should not have errors
+*/
+}
+
+#chart1 svg {
+  height: 600px;
+  width:600px;
+}
+
+</style>
+<body>
+	Comparisons Between Cities
+  <div id="chart1" class='with-3d-shadow with-transitions'>
+    <svg></svg>
+  </div>
+
+<script src="../lib/d3.v3.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/tooltip.js"></script>
+<script src="../src/models/legend.js"></script>
+<script src="../src/models/axis.js"></script>
+<script src="../src/models/multiBarHorizontal.js"></script>
+<script src="../src/models/multiBarHorizontalChart.js"></script>
+<script src="stream_layers.js"></script>
+<script>
+
+
+
+dataset = [ 
+  {
+    key: 'Boston',
+    color: '#53B03C',
+    values: [
+{"label": "Food Beverage Hospitality", "value":2.94945125485943},
+{"label": "Administrative Office", "value":1.98727896741633},
+{"label": "Nonprofit Sector", "value":1.66630500686003},
+{"label": "Accounting Finance", "value":1.30435166699596},
+{"label": "software qa dba", "value":1.27170420854638},
+{"label": "salon spa fitness", "value":0.502872400673049},
+{"label": "human resources", "value":0.435005901013954},
+{"label": "retail wholesale", "value":0.402176971465313},
+{"label": "[ETC]", "value":0.376704679206328},
+{"label": "marketing pr ad", "value":0.337549302806696},
+{"label": "systems network", "value":0.322491233799365},
+{"label": "education", "value":0.315124950995461},
+{"label": "biotech science", "value":0.287554037166786},
+{"label": "customer service", "value":0.241760957513264},
+{"label": "web info design", "value":0.237415102083649},
+{"label": "technical support", "value":0.192139931506952},
+{"label": "writing editing", "value":0.161517041883705},
+{"label": "business mgmt", "value":0.081416926298816},
+{"label": "internet engineers", "value":-0.016095068073956},
+{"label": "government", "value":-0.081210580234445},
+{"label": "art media design", "value":-0.104296540096648},
+{"label": "arch engineering", "value":-0.198928567797708},
+{"label": "security", "value":-0.306167120463541},
+{"label": "legal paralegal", "value":-0.351537955448492},
+{"label": "real estate", "value":-0.375623119076466},
+{"label": "tv film video", "value":-0.38411863355706},
+{"label": "manufacturing", "value":-0.840889053342961},
+{"label": "medical health", "value":-0.938071625960677},
+{"label": "general labor", "value":-1.26350815488635},
+{"label": "skilled trade craft", "value":-2.12564613574315},
+{"label": "sales biz dev", "value":-2.56309000701508},
+{"label": "transport", "value":-3.52363797939493},
+    ]
+  },
+  {
+    key: 'SF Bay',
+    color: '#AFD671',
+    values: [
+{"label": "Food Beverage Hospitality", "value":0.363231004394658},
+{"label": "Administrative Office", "value":0.163345190834556},
+{"label": "Nonprofit Sector", "value":3.00186791555749},
+{"label": "Accounting Finance", "value":0.999450876014206},
+{"label": "software qa dba", "value":2.385626742085},
+{"label": "salon spa fitness", "value":-0.688240819940302},
+{"label": "human resources", "value":0.369538250261645},
+{"label": "retail wholesale", "value":1.28998308134243},
+{"label": "[ETC]", "value":0.214677691839835},
+{"label": "marketing pr ad", "value":0.514516529135208},
+{"label": "systems network", "value":0.283585559295105},
+{"label": "education", "value":1.8503112999636},
+{"label": "biotech science", "value":0.413740877895203},
+{"label": "customer service", "value":-0.420183071418047},
+{"label": "web info design", "value":0.323747068958689},
+{"label": "technical support", "value":0.186644869454421},
+{"label": "writing editing", "value":-0.029639441631621},
+{"label": "business mgmt", "value":0.083065910342581},
+{"label": "internet engineers", "value":0.742957502517496},
+{"label": "government", "value":0.084115196563116},
+{"label": "art media design", "value":0.26459841132967},
+{"label": "arch engineering", "value":0.478873414609102},
+{"label": "security", "value":0.145410294715888},
+{"label": "legal paralegal", "value":0.117627984041673},
+{"label": "real estate", "value":-0.563449328325089},
+{"label": "tv film video", "value":-0.537599541407347},
+{"label": "manufacturing", "value":-0.387156158937804},
+{"label": "medical health", "value":-0.434688788445333},
+{"label": "general labor", "value":-3.15553158457593},
+{"label": "skilled trade craft", "value":-2.0143576454563},
+{"label": "sales biz dev", "value":-2.34458141476784},
+{"label": "transport", "value":-3.70148787624596},
+    ]
+  },
+  {
+    key: 'Seattle',
+    color: '#4A7C28',
+    values: [
+{"label": "Food Beverage Hospitality", "value":-1.66345952447578},
+{"label": "Administrative Office", "value":-0.360233583205485},
+{"label": "Nonprofit Sector", "value":0.638395199759647},
+{"label": "Accounting Finance", "value":0.168403149770448},
+{"label": "software qa dba", "value":2.35465147946286},
+{"label": "salon spa fitness", "value":-0.395598736163039},
+{"label": "human resources", "value":0.209673866572262},
+{"label": "retail wholesale", "value":0.492296367869129},
+{"label": "[ETC]", "value":0.02369772189373},
+{"label": "marketing pr ad", "value":-0.672572740792315},
+{"label": "systems network", "value":0.356716028629182},
+{"label": "education", "value":0.034234873662145},
+{"label": "biotech science", "value":0.025794210194828},
+{"label": "customer service", "value":-0.004119521113959},
+{"label": "web info design", "value":0.094024612765778},
+{"label": "technical support", "value":0.260973677791792},
+{"label": "writing editing", "value":0.000917085330508},
+{"label": "business mgmt", "value":0.317547697171786},
+{"label": "internet engineers", "value":0.208920271393786},
+{"label": "government", "value":0.272429017452151},
+{"label": "art media design", "value":-0.175194238122961},
+{"label": "arch engineering", "value":0.475273430390917},
+{"label": "security", "value":-0.327103094356841},
+{"label": "legal paralegal", "value":-0.411526729679808},
+{"label": "real estate", "value":0.169832065560189},
+{"label": "tv film video", "value":-0.478328079961727},
+{"label": "manufacturing", "value":0.389373475846665},
+{"label": "medical health", "value":3.42450770491224},
+{"label": "general labor", "value":0.111097572051654},
+{"label": "skilled trade craft", "value":-0.133011853682375},
+{"label": "sales biz dev", "value":-2.37834402632966},
+{"label": "transport", "value":-3.02926738059774},
+    ]
+  },
+  {
+    key: 'Chicago',
+    color: '#60E444',
+    values: [
+{"label": "Food Beverage Hospitality", "value":-0.5078510016968},
+{"label": "Administrative Office", "value":-0.401165183003017},
+{"label": "Nonprofit Sector", "value":-0.453673943311722},
+{"label": "Accounting Finance", "value":-0.423953231265396},
+{"label": "software qa dba", "value":-0.406768682432638},
+{"label": "salon spa fitness", "value":0.265902770343615},
+{"label": "human resources", "value":0.031615042629732},
+{"label": "retail wholesale", "value":0.292151968834403},
+{"label": "[ETC]", "value":0.090452783900959},
+{"label": "marketing pr ad", "value":0.429257003411152},
+{"label": "systems network", "value":0.038707398406196},
+{"label": "education", "value":0.305010729055155},
+{"label": "biotech science", "value":-0.0739754793986},
+{"label": "customer service", "value":-0.25530654799558},
+{"label": "web info design", "value":0.376082117396168},
+{"label": "technical support", "value":-0.22600148168446},
+{"label": "writing editing", "value":0.052357514631472},
+{"label": "business mgmt", "value":-0.181233124548162},
+{"label": "internet engineers", "value":0.028080453649632},
+{"label": "government", "value":-0.074352953581292},
+{"label": "art media design", "value":0.386412452151076},
+{"label": "arch engineering", "value":-0.294771095959802},
+{"label": "security", "value":-0.219729610787737},
+{"label": "legal paralegal", "value":-0.289897850185318},
+{"label": "real estate", "value":-0.540195793777535},
+{"label": "tv film video", "value":0.006837444536199},
+{"label": "manufacturing", "value":0.214046101342844},
+{"label": "medical health", "value":-1.55984253273833},
+{"label": "general labor", "value":-0.553103559777383},
+{"label": "skilled trade craft", "value":-2.68889559865209},
+{"label": "sales biz dev", "value":-0.497936191310338},
+{"label": "transport", "value":7.13174008181759},
+    ]
+  },
+  {
+    key: 'Los Angeles',
+    color: '#4DAC70',
+    values: [
+{"label": "Food Beverage Hospitality", "value":-1.83582170698281},
+{"label": "Administrative Office", "value":1.95690290904566},
+{"label": "Nonprofit Sector", "value":0.087397893971896},
+{"label": "Accounting Finance", "value":0.786821551735934},
+{"label": "software qa dba", "value":-0.23644441227414},
+{"label": "salon spa fitness", "value":-0.040578443928288},
+{"label": "human resources", "value":0.130332091788911},
+{"label": "retail wholesale", "value":-0.176942959006864},
+{"label": "[ETC]", "value":1.56941976193087},
+{"label": "marketing pr ad", "value":1.44132572802413},
+{"label": "systems network", "value":-0.061836390110903},
+{"label": "education", "value":0.211769828684008},
+{"label": "biotech science", "value":-0.053247771004405},
+{"label": "customer service", "value":0.498458222602197},
+{"label": "web info design", "value":0.647542688736463},
+{"label": "technical support", "value":-0.042433659460258},
+{"label": "writing editing", "value":0.237548241992004},
+{"label": "business mgmt", "value":-0.015268045900521},
+{"label": "internet engineers", "value":0.09167512773394},
+{"label": "government", "value":-0.062645495223002},
+{"label": "art media design", "value":0.914787994643896},
+{"label": "arch engineering", "value":-0.087154288315198},
+{"label": "security", "value":0.273783990916963},
+{"label": "legal paralegal", "value":1.31937221946717},
+{"label": "real estate", "value":0.141116454194182},
+{"label": "tv film video", "value":1.57189694433738},
+{"label": "manufacturing", "value":-0.45364156144477},
+{"label": "medical health", "value":-0.683153272040856},
+{"label": "general labor", "value":-3.50973583765021},
+{"label": "skilled trade craft", "value":-3.6951637414238},
+{"label": "sales biz dev", "value":1.32280380632676},
+{"label": "transport", "value":-2.24888787136633},
+    ]
+  },
+  {
+    key: 'New York',
+    color: '#A2DC46',
+    values: [
+{"label": "Food Beverage Hospitality", "value":8.89045599192542},
+{"label": "Administrative Office", "value":1.6121728720847},
+{"label": "Nonprofit Sector", "value":-0.414250683775563},
+{"label": "Accounting Finance", "value":0.359369910203826},
+{"label": "software qa dba", "value":-0.129989425906463},
+{"label": "salon spa fitness", "value":0.457496248722365},
+{"label": "human resources", "value":0.137995182782302},
+{"label": "retail wholesale", "value":1.49971203268577},
+{"label": "[ETC]", "value":0.299153354365045},
+{"label": "marketing pr ad", "value":1.03849745862058},
+{"label": "systems network", "value":0.180922255360282},
+{"label": "education", "value":-0.036243237154363},
+{"label": "biotech science", "value":-0.133714926590427},
+{"label": "customer service", "value":-1.4944793450637},
+{"label": "web info design", "value":0.357957066241906},
+{"label": "technical support", "value":-0.088599716884298},
+{"label": "writing editing", "value":0.376519822399757},
+{"label": "business mgmt", "value":-0.318621660510521},
+{"label": "internet engineers", "value":0.205538477874818},
+{"label": "government", "value":-0.010066093394749},
+{"label": "art media design", "value":1.43719910256573},
+{"label": "arch engineering", "value":0.476991584634173},
+{"label": "security", "value":0.067477277136504},
+{"label": "legal paralegal", "value":1.03514774267345},
+{"label": "real estate", "value":0.131987692178297},
+{"label": "tv film video", "value":0.58199798827865},
+{"label": "manufacturing", "value":-1.40422968977241},
+{"label": "medical health", "value":-1.5412994503095},
+{"label": "general labor", "value":-3.58560362610898},
+{"label": "skilled trade craft", "value":-4.23452544745384},
+{"label": "sales biz dev", "value":-2.07996474636526},
+{"label": "transport", "value":-3.67500401144349},
+    ]
+  },
+  {
+    key: 'Houston',
+    color: '#72905F',
+    values: [
+{"label": "Food Beverage Hospitality", "value":-0.991821398841333},
+{"label": "Administrative Office", "value":-0.246947412669804},
+{"label": "Nonprofit Sector", "value":-1.18889071006539},
+{"label": "Accounting Finance", "value":-0.621798781905237},
+{"label": "software qa dba", "value":-0.914874538996944},
+{"label": "salon spa fitness", "value":-0.549845867101981},
+{"label": "human resources", "value":-0.168245488358172},
+{"label": "retail wholesale", "value":0.199378989150226},
+{"label": "[ETC]", "value":-0.704603759838398},
+{"label": "marketing pr ad", "value":-0.359704977956181},
+{"label": "systems network", "value":-0.243697620701323},
+{"label": "education", "value":-0.291312987444306},
+{"label": "biotech science", "value":-0.037953939772615},
+{"label": "customer service", "value":-0.448804325149127},
+{"label": "web info design", "value":-0.395627000867807},
+{"label": "technical support", "value":-0.410202939360586},
+{"label": "writing editing", "value":-0.122754969829964},
+{"label": "business mgmt", "value":-0.018990285898194},
+{"label": "internet engineers", "value":-0.176163294630162},
+{"label": "government", "value":-0.061667024828823},
+{"label": "art media design", "value":-0.349275126486914},
+{"label": "arch engineering", "value":-0.028201778461942},
+{"label": "security", "value":1.34636498182967},
+{"label": "legal paralegal", "value":-0.593293872426259},
+{"label": "real estate", "value":0.074538616808046},
+{"label": "tv film video", "value":-0.104847759083266},
+{"label": "manufacturing", "value":0.563607089640906},
+{"label": "medical health", "value":-1.1641378446665},
+{"label": "general labor", "value":2.46216950686227},
+{"label": "skilled trade craft", "value":2.63741578907403},
+{"label": "sales biz dev", "value":0.295723866488586},
+{"label": "transport", "value":2.61446486548751},
+    ]
+  },
+  {
+    key: "Detroit",
+    color: "#62E790",
+    values: [
+{"label": "Food Beverage Hospitality", "value":-1.65865109088909},
+{"label": "Administrative Office", "value":-1.02640336267227},
+{"label": "Nonprofit Sector", "value":-0.875168983214228},
+{"label": "Accounting Finance", "value":-1.1653496828228},
+{"label": "software qa dba", "value":-1.04715248532421},
+{"label": "salon spa fitness", "value":0.060161964282756},
+{"label": "human resources", "value":-0.265968220339821},
+{"label": "retail wholesale", "value":-0.786743427109455},
+{"label": "[ETC]", "value":-1.15271929434582},
+{"label": "marketing pr ad", "value":-1.41836598074341},
+{"label": "systems network", "value":-0.154648378557373},
+{"label": "education", "value":-1.16610988017283},
+{"label": "biotech science", "value":-0.195410250512095},
+{"label": "customer service", "value":-1.52032621911094},
+{"label": "web info design", "value":-0.399105261067107},
+{"label": "technical support", "value":-0.232015812430489},
+{"label": "writing editing", "value":-0.210353170461408},
+{"label": "business mgmt", "value":-0.55998789331766},
+{"label": "internet engineers", "value":-0.214063805211781},
+{"label": "government", "value":-0.064220318326924},
+{"label": "art media design", "value":-0.038106693133848},
+{"label": "arch engineering", "value":-0.17245418954181},
+{"label": "security", "value":0.08741785600953},
+{"label": "legal paralegal", "value":-0.561557879505337},
+{"label": "real estate", "value":-0.814209856996897},
+{"label": "tv film video", "value":0.006782232653698},
+{"label": "manufacturing", "value":1.68269346919791},
+{"label": "medical health", "value":0.424309398316085},
+{"label": "general labor", "value":7.91058565554758},
+{"label": "skilled trade craft", "value":1.81282531808098},
+{"label": "sales biz dev", "value":-2.50808915457599},
+{"label": "transport", "value":6.22240539629506}, 
+    ]
+  },
+];
+
+
+
+
+
+var chart;
+nv.addGraph(function() {
+  chart = nv.models.multiBarHorizontalChart()
+      .x(function(d) { return d.label })
+      .y(function(d) { return d.value })
+      .margin({top: 30, right: 20, bottom: 50, left:150})
+      //.showValues(true)
+      //.tooltips(false)
+      .transitionDuration(500)
+      .stacked(true)
+  	  .showValues(false);
+      //.showControls(false);
+
+  chart.yAxis
+      .tickFormat(d3.format(',.2f'));
+
+  d3.select('#chart1 svg')
+      .datum(dataset)
+      .call(chart);
+      
+	  
+  nv.utils.windowResize(chart.update);
+
+  chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+  return chart;
+});
+
+
+
+</script>
